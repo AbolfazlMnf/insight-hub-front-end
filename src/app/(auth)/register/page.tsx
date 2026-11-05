@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/modules/auth/api';
+import { getApiErrorMessage } from '@/shared/api/client';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/shared/components/ui/card';
@@ -30,7 +31,7 @@ export default function RegisterPage() {
       router.push('/login');
     },
     onError: (err: unknown) => {
-      const msg = err instanceof Error ? err.message : 'Registration failed';
+      const msg = getApiErrorMessage(err, 'Registration failed');
       setError(msg);
     },
   });

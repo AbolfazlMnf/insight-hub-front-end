@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentApi } from '../api';
+import { getApiErrorMessage } from '@/shared/api/client';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Upload, X, FileText, Loader2 } from 'lucide-react';
@@ -43,7 +44,7 @@ export function UploadDocumentModal({
       onClose();
     },
     onError: (err: unknown) => {
-      const msg = err instanceof Error ? err.message : 'Upload failed';
+      const msg = getApiErrorMessage(err, 'Upload failed');
       setError(msg);
     },
   });

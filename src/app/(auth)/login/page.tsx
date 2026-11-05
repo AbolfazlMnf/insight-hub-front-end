@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { authApi } from "@/modules/auth/api";
 import { useAuthStore } from "@/modules/auth/store";
+import { getApiErrorMessage } from "@/shared/api/client";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -49,8 +50,7 @@ export default function LoginPage() {
       router.push("/");
     },
     onError: (err: unknown) => {
-      const msg = err instanceof Error ? err.message : "Invalid credentials";
-      console.log("Login error:", msg);
+      const msg = getApiErrorMessage(err, "Invalid credentials");
       setError(msg);
     },
   });

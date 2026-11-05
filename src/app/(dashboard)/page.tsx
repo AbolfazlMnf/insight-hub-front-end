@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { workspaceApi } from '@/modules/workspace/api';
 import { useWorkspaceStore } from '@/modules/workspace/store';
+import { getApiErrorMessage } from '@/shared/api/client';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/shared/components/ui/card';
@@ -15,6 +16,7 @@ export default function WorkspacesListPage() {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const { setCurrentWorkspace } = useWorkspaceStore();
   const queryClient = useQueryClient();
@@ -30,7 +32,12 @@ export default function WorkspacesListPage() {
       queryClient.invalidateQueries({ queryKey: ['user-workspaces'] });
       setName('');
       setSlug('');
+      setCreateError(null);
       setIsCreating(false);
+    },
+    onError: (err: unknown) => {
+      const msg = getApiErrorMessage(err, 'Failed to create workspace');
+      setCreateError(msg);
     },
   });
 
@@ -61,9 +68,15 @@ export default function WorkspacesListPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {createError && (
+              <div className="rounded-md bg-destructive/10 p-2.5 text-xs text-destructive mb-4">
+                {createError}
+              </div>
+            )}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                setCreateError(null);
                 createMutation.mutate();
               }}
               className="space-y-4 max-w-md"

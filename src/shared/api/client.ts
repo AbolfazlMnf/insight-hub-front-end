@@ -25,9 +25,51 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Clear credentials on unauthorized
-      useAuthStore.getState().logout();
+      // Clear credentials on unauthorized only if not on auth routes
+      const isAuthRoute =
+        typeof window !== 'undefined' &&
+        (window.location.pathname.startsWith('/login') ||
+          window.location.pathname.startsWith('/register'));
+
+      if (!isAuthRoute) {
+        useAuthStore.getState().logout();
+      }
     }
     return Promise.reject(error);
   }
 );
+
+/**
+ * Extracts the user-friendly error message returned by NestJS pipes and exception filters.
+ */
+export function getApiErrorMessage(
+  error: unknown,
+  fallback = 'An unexpected error occurred'
+): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as
+      | { message?: string | string[]; error?: string }
+      | undefined;
+
+    if (data?.message) {
+      if (Array.isArray(data.message)) {
+        return data.message.join(' | ');
+      }
+      return data.message;
+    }
+
+    if (data?.error) {
+      return data.error;
+    }
+
+    if (typeof error.response?.data === 'string' && error.response.data.trim()) {
+      return error.response.data;
+    }
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
+}
