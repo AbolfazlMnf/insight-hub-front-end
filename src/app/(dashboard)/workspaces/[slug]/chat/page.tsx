@@ -47,7 +47,7 @@ function ChatContent({
   }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex-1 flex flex-col min-h-0 overflow-hidden">
       <ChatInterface workspaceId={workspaceId!} />
     </div>
   );

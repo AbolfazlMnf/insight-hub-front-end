@@ -16,6 +16,15 @@ export function useWorkspaceBySlug(slugOrId: string) {
     setMounted(true);
   }, []);
 
+  const normalizedInput = useMemo(() => {
+    if (!slugOrId) return '';
+    try {
+      return decodeURIComponent(slugOrId).trim().toLowerCase();
+    } catch {
+      return slugOrId.trim().toLowerCase();
+    }
+  }, [slugOrId]);
+
   const {
     data: workspacesResponse,
     isLoading: isListLoading,
@@ -27,16 +36,18 @@ export function useWorkspaceBySlug(slugOrId: string) {
   });
 
   const matchedWorkspace = useMemo<Workspace | null>(() => {
-    if (!slugOrId) return null;
+    if (!normalizedInput) return null;
     const list = workspacesResponse?.data;
     if (!list || list.length === 0) return null;
 
     return (
-      list.find((w) => w.slug === slugOrId) ||
-      list.find((w) => w.id === slugOrId) ||
-      null
+      list.find(
+        (w) =>
+          w.slug.toLowerCase() === normalizedInput ||
+          w.id.toLowerCase() === normalizedInput
+      ) || null
     );
-  }, [workspacesResponse, slugOrId]);
+  }, [workspacesResponse, normalizedInput]);
 
   // Sync with global workspace store
   useEffect(() => {
@@ -45,17 +56,21 @@ export function useWorkspaceBySlug(slugOrId: string) {
     }
   }, [matchedWorkspace, currentWorkspace, setCurrentWorkspace]);
 
+  // If current workspace in store matches normalized input, use it as fast fallback
+  const fallbackFromStore =
+    currentWorkspace &&
+    (currentWorkspace.slug.toLowerCase() === normalizedInput ||
+      currentWorkspace.id.toLowerCase() === normalizedInput)
+      ? currentWorkspace
+      : null;
+
+  const resolvedWorkspace = matchedWorkspace || fallbackFromStore;
+
   // Before mount or while query is loading, preserve loading state consistently
   const isLoading =
     !mounted ||
     isListLoading ||
-    (mounted && Boolean(user) && !workspacesResponse && !listError);
-
-  const resolvedWorkspace =
-    matchedWorkspace ||
-    (currentWorkspace?.slug === slugOrId || currentWorkspace?.id === slugOrId
-      ? currentWorkspace
-      : null);
+    (mounted && Boolean(user) && !workspacesResponse && !listError && !resolvedWorkspace);
 
   return {
     workspace: resolvedWorkspace,

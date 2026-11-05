@@ -23,21 +23,34 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isAuthenticated: false,
-      setAuth: (token, user) =>
+      setAuth: (token, user) => {
+        if (typeof document !== 'undefined') {
+          document.cookie = `auth_token=${encodeURIComponent(token)}; path=/; max-age=604800; SameSite=Lax`;
+        }
         set({
           token,
           user,
           isAuthenticated: true,
-        }),
-      logout: () =>
+        });
+      },
+      logout: () => {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'auth_token=; path=/; max-age=0; SameSite=Lax';
+        }
         set({
           token: null,
           user: null,
           isAuthenticated: false,
-        }),
+        });
+      },
     }),
     {
       name: 'insight-hub-auth',
+      onRehydrateStorage: () => (state) => {
+        if (typeof document !== 'undefined' && state?.token) {
+          document.cookie = `auth_token=${encodeURIComponent(state.token)}; path=/; max-age=604800; SameSite=Lax`;
+        }
+      },
     }
   )
 );

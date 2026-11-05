@@ -1,5 +1,4 @@
 import { apiClient } from '@/shared/api/client';
-import { useAuthStore } from '@/modules/auth/store';
 import {
   DocumentItem,
   DocumentStatusResponse,
@@ -17,18 +16,22 @@ export const documentApi = {
       status?: string;
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
-      userId?: string;
     }
   ): Promise<PaginatedDocuments> => {
-    const currentUserId = useAuthStore.getState().user?.id;
-    const queryParams = {
-      ...params,
-      ...(currentUserId ? { userId: currentUserId } : {}),
-    };
+    // Note: Do NOT send userId in query params; NestJS ValidationPipe with forbidNonWhitelisted: true
+    // will reject unwhitelisted properties with 400 Bad Request.
+    // User identity is verified via the JWT Bearer token in the Authorization header.
+    const cleanParams: Record<string, unknown> = {};
+    if (params?.page) cleanParams.page = params.page;
+    if (params?.limit) cleanParams.limit = params.limit;
+    if (params?.search) cleanParams.search = params.search;
+    if (params?.status) cleanParams.status = params.status;
+    if (params?.sortBy) cleanParams.sortBy = params.sortBy;
+    if (params?.sortOrder) cleanParams.sortOrder = params.sortOrder;
 
     const res = await apiClient.get<PaginatedDocuments>(
       `/documents/workspace/${workspaceId}`,
-      { params: queryParams }
+      { params: cleanParams }
     );
     return res.data;
   },
@@ -50,11 +53,8 @@ export const documentApi = {
     formData.append('file', input.file);
     formData.append('title', input.title);
 
-    const currentUserId = useAuthStore.getState().user?.id;
-    if (currentUserId) {
-      formData.append('userId', currentUserId);
-    }
-
+    // Note: Do NOT append userId to formData; UploadDocumentDto only allows title & file.
+    // NestJS verifies membership through the JWT Bearer token.
     const res = await apiClient.post<DocumentItem>(
       `/documents/upload/${input.workspaceId}`,
       formData,

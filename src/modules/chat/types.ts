@@ -8,18 +8,19 @@ export interface ChatMessage {
   metadata?: AgentMetadata;
 }
 
+export interface AgentSource {
+  documentId: string;
+  chunkId: string;
+  documentTitle?: string;
+  chunkIndex?: number;
+  score?: number;
+  title?: string;
+  content?: string;
+}
+
 export interface AgentMetadata {
-  toolsUsed?: Array<{
-    name: string;
-    input?: unknown;
-    output?: unknown;
-  }>;
-  sources?: Array<{
-    title?: string;
-    content?: string;
-    score?: number;
-    documentId?: string;
-  }>;
+  toolsUsed?: Array<string | { name?: string; input?: unknown; output?: unknown }>;
+  sources?: AgentSource[];
   [key: string]: unknown;
 }
 
