@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
-import { authApi } from '@/modules/auth/api';
-import { getApiErrorMessage } from '@/shared/api/client';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { authApi } from "@/modules/auth/api";
+import { getApiErrorMessage } from "@/shared/api/client";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from '@/shared/components/ui/card';
-import Link from 'next/link';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+} from "@/shared/components/ui/card";
+import Link from "next/link";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,13 +36,12 @@ export default function RegisterPage() {
         password,
       }),
     onSuccess: () => {
-      toast.success('Account created successfully! Please sign in.');
-      router.push('/login');
+      toast.success("Account created successfully! Please sign in.");
+      router.push("/login");
     },
     onError: (err: unknown) => {
-      const msg = getApiErrorMessage(err, 'Registration failed');
+      const msg = getApiErrorMessage(err, "Registration failed");
       setError(msg);
-      toast.error(msg);
     },
   });
 
@@ -75,7 +74,9 @@ export default function RegisterPage() {
             )}
 
             <div>
-              <label className="text-xs font-medium block mb-1">Full Name</label>
+              <label className="text-xs font-medium block mb-1">
+                Full Name
+              </label>
               <Input
                 type="text"
                 placeholder="Alex Developer"
@@ -110,7 +111,7 @@ export default function RegisterPage() {
               <label className="text-xs font-medium block mb-1">Password</label>
               <div className="relative">
                 <Input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -122,7 +123,7 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   tabIndex={-1}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -144,13 +145,16 @@ export default function RegisterPage() {
                   Creating account...
                 </>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </Button>
 
             <div className="text-center text-xs text-muted-foreground pt-2">
-              Already have an account?{' '}
-              <Link href="/login" className="text-primary hover:underline font-medium">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-primary hover:underline font-medium"
+              >
                 Sign in
               </Link>
             </div>

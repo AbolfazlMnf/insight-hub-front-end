@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Send,
   Bot,
@@ -11,14 +11,14 @@ import {
   BookOpen,
   Square,
   Sparkles,
-} from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
-import { ChatMessage, AgentMetadata } from '../types';
-import { streamWorkspaceChat } from '@/shared/api/sse-stream';
+} from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import { ChatMessage, AgentMetadata } from "../types";
+import { streamWorkspaceChat } from "@/shared/api/sse-stream";
 
 export function ChatInterface({ workspaceId }: { workspaceId: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [conversationId, setConversationId] = useState<string | undefined>();
 
@@ -26,7 +26,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -37,12 +37,12 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
     if (!input.trim() || isStreaming) return;
 
     const userText = input.trim();
-    setInput('');
+    setInput("");
 
     // Append user message
     const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
-      role: 'USER',
+      role: "USER",
       content: userText,
       createdAt: new Date().toISOString(),
     };
@@ -51,8 +51,8 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
     const assistantId = crypto.randomUUID();
     const placeholderAssistantMessage: ChatMessage = {
       id: assistantId,
-      role: 'ASSISTANT',
-      content: '',
+      role: "ASSISTANT",
+      content: "",
       createdAt: new Date().toISOString(),
     };
 
@@ -62,7 +62,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    let accumulatedText = '';
+    let accumulatedText = "";
     let accumulatedMetadata: AgentMetadata | undefined;
 
     await streamWorkspaceChat(
@@ -78,8 +78,8 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
           accumulatedText += data.text;
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantId ? { ...m, content: accumulatedText } : m
-            )
+              m.id === assistantId ? { ...m, content: accumulatedText } : m,
+            ),
           );
         },
         onMetadata: (data) => {
@@ -88,8 +88,8 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
             prev.map((m) =>
               m.id === assistantId
                 ? { ...m, metadata: accumulatedMetadata }
-                : m
-            )
+                : m,
+            ),
           );
         },
         onDone: () => {
@@ -97,18 +97,18 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
           abortControllerRef.current = null;
         },
         onError: (err) => {
-          console.error('Streaming error', err);
-          accumulatedText += '\n\n*(Error receiving stream response)*';
+          console.error("Streaming error", err);
+          accumulatedText += "\n\n*(Error receiving stream response)*";
           setMessages((prev) =>
             prev.map((m) =>
-              m.id === assistantId ? { ...m, content: accumulatedText } : m
-            )
+              m.id === assistantId ? { ...m, content: accumulatedText } : m,
+            ),
           );
           setIsStreaming(false);
           abortControllerRef.current = null;
         },
       },
-      controller.signal
+      controller.signal,
     );
   };
 
@@ -125,9 +125,6 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
           <h2 className="text-sm font-semibold">Agentic Assistant</h2>
-          <span className="text-xs text-muted-foreground">
-            (RAG & Tool Execution)
-          </span>
         </div>
       </div>
 
@@ -138,20 +135,23 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
             <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center text-primary mb-3">
               <Bot className="h-6 w-6" />
             </div>
-            <h3 className="text-base font-semibold">How can I assist your team today?</h3>
+            <h3 className="text-base font-semibold">
+              How can I assist your team today?
+            </h3>
             <p className="text-xs text-muted-foreground max-w-md mt-1">
-              Ask questions across uploaded documents, query vector indexes, or trigger external MCP integrations.
+              Ask questions across uploaded documents, query vector indexes, or
+              trigger external MCP integrations.
             </p>
           </div>
         ) : (
           messages.map((message) => {
-            const isUser = message.role === 'USER';
+            const isUser = message.role === "USER";
 
             return (
               <div
                 key={message.id}
                 className={`flex gap-3 text-sm ${
-                  isUser ? 'justify-end' : 'justify-start'
+                  isUser ? "justify-end" : "justify-start"
                 }`}
               >
                 {!isUser && (
@@ -163,8 +163,8 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                 <div
                   className={`max-w-[85%] rounded-lg px-4 py-3 ${
                     isUser
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-card border border-border text-card-foreground shadow-sm'
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card border border-border text-card-foreground shadow-sm"
                   }`}
                 >
                   {/* Message Content */}
@@ -215,7 +215,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                                   className="text-[11px] rounded bg-muted/50 p-1.5 text-muted-foreground"
                                 >
                                   <span className="font-medium text-foreground">
-                                    {src.title || 'Referenced Document'}
+                                    {src.title || "Referenced Document"}
                                   </span>
                                   {src.content && (
                                     <p className="line-clamp-2 mt-0.5">

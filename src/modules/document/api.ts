@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+import { useAuthStore } from '@/modules/auth/store';
 import {
   DocumentItem,
   DocumentStatusResponse,
@@ -16,11 +17,18 @@ export const documentApi = {
       status?: string;
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
+      userId?: string;
     }
   ): Promise<PaginatedDocuments> => {
+    const currentUserId = useAuthStore.getState().user?.id;
+    const queryParams = {
+      ...params,
+      ...(currentUserId ? { userId: currentUserId } : {}),
+    };
+
     const res = await apiClient.get<PaginatedDocuments>(
       `/documents/workspace/${workspaceId}`,
-      { params }
+      { params: queryParams }
     );
     return res.data;
   },
@@ -41,13 +49,21 @@ export const documentApi = {
     const formData = new FormData();
     formData.append('file', input.file);
     formData.append('title', input.title);
-    formData.append('workspaceId', input.workspaceId);
 
-    const res = await apiClient.post<DocumentItem>('/documents/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const currentUserId = useAuthStore.getState().user?.id;
+    if (currentUserId) {
+      formData.append('userId', currentUserId);
+    }
+
+    const res = await apiClient.post<DocumentItem>(
+      `/documents/upload/${input.workspaceId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
     return res.data;
   },
 
@@ -56,6 +72,6 @@ export const documentApi = {
   },
 
   retryDocument: async (id: string): Promise<void> => {
-    await apiClient.post(`/documents/${id}/retry`);
+    await apiClient.post(`/documents/${id}/retryFailed`);
   },
 };

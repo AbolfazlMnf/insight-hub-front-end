@@ -10,12 +10,12 @@ export interface Workspace {
 }
 
 export interface WorkspaceMember {
-  id: string;
+  id?: string;
   role: WorkspaceRole;
-  userId: string;
-  workspaceId: string;
+  userId?: string;
+  workspaceId?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   user: {
     id: string;
     email: string;
@@ -49,11 +49,11 @@ export interface UpdateWorkspaceInput {
 }
 
 export interface AddMemberInput {
-  userId: string;
+  targetUserId: string;
   role: WorkspaceRole;
 }
 
 export interface ChangeRoleInput {
-  userId: string;
+  targetUserId: string;
   role: WorkspaceRole;
 }

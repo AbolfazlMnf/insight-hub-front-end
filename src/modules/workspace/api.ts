@@ -9,6 +9,22 @@ import {
   ChangeRoleInput,
 } from './types';
 
+// Helper to normalize backend workspace responses (which might wrap workspace inside WorkspaceMember)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalizeWorkspace(item: any): Workspace {
+  if (item && item.workspace) {
+    return {
+      id: item.workspace.id,
+      name: item.workspace.name,
+      slug: item.workspace.slug,
+      createdAt: item.workspace.createdAt || item.createdAt,
+      updatedAt: item.workspace.updatedAt || item.updatedAt,
+      role: item.role,
+    };
+  }
+  return item;
+}
+
 export const workspaceApi = {
   getUserWorkspaces: async (params?: {
     page?: number;
@@ -17,28 +33,35 @@ export const workspaceApi = {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }): Promise<PaginatedResponse<Workspace>> => {
-    const res = await apiClient.get<PaginatedResponse<Workspace>>('/workspaces', {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await apiClient.get<PaginatedResponse<any>>('/workspaces', {
       params,
     });
-    return res.data;
+    return {
+      data: (res.data.data || []).map(normalizeWorkspace),
+      meta: res.data.meta,
+    };
   },
 
   getWorkspace: async (id: string): Promise<Workspace> => {
-    const res = await apiClient.get<Workspace>(`/workspaces/${id}`);
-    return res.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await apiClient.get<any>(`/workspaces/${id}`);
+    return normalizeWorkspace(res.data);
   },
 
   createWorkspace: async (data: CreateWorkspaceInput): Promise<Workspace> => {
-    const res = await apiClient.post<Workspace>('/workspaces/create', data);
-    return res.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await apiClient.post<any>('/workspaces/create', data);
+    return normalizeWorkspace(res.data);
   },
 
   updateWorkspace: async (
     id: string,
     data: UpdateWorkspaceInput
   ): Promise<Workspace> => {
-    const res = await apiClient.patch<Workspace>(`/workspaces/${id}`, data);
-    return res.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await apiClient.patch<any>(`/workspaces/${id}`, data);
+    return normalizeWorkspace(res.data);
   },
 
   deleteWorkspace: async (id: string): Promise<void> => {
@@ -63,8 +86,13 @@ export const workspaceApi = {
     return res.data;
   },
 
-  removeMember: async (workspaceId: string, userId: string): Promise<void> => {
-    await apiClient.delete(`/workspaces/${workspaceId}/members/${userId}`);
+  removeMember: async (
+    workspaceId: string,
+    targetUserId: string
+  ): Promise<void> => {
+    await apiClient.delete(`/workspaces/${workspaceId}/members`, {
+      data: { targetUserId },
+    });
   },
 
   changeMemberRole: async (

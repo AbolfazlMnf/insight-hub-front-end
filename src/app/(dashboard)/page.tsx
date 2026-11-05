@@ -1,21 +1,27 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { workspaceApi } from '@/modules/workspace/api';
-import { useWorkspaceStore } from '@/modules/workspace/store';
-import { getApiErrorMessage } from '@/shared/api/client';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/shared/components/ui/card';
-import Link from 'next/link';
-import { Database, Plus, ArrowRight, Loader2 } from 'lucide-react';
-import { Workspace } from '@/modules/workspace/types';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { workspaceApi } from "@/modules/workspace/api";
+import { useWorkspaceStore } from "@/modules/workspace/store";
+import { getApiErrorMessage } from "@/shared/api/client";
+import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/shared/components/ui/card";
+import Link from "next/link";
+import { Database, Plus, ArrowRight, Loader2, Trash2 } from "lucide-react";
+import { Workspace } from "@/modules/workspace/types";
+import { toast } from "sonner";
 
 export default function WorkspacesListPage() {
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -23,23 +29,39 @@ export default function WorkspacesListPage() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['user-workspaces'],
+    queryKey: ["user-workspaces"],
     queryFn: () => workspaceApi.getUserWorkspaces({ limit: 50 }),
   });
 
   const createMutation = useMutation({
     mutationFn: () => workspaceApi.createWorkspace({ name, slug }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-workspaces'] });
-      setName('');
-      setSlug('');
+    onSuccess: (newWs) => {
+      queryClient.invalidateQueries({ queryKey: ["user-workspaces"] });
+      setName("");
+      setSlug("");
       setCreateError(null);
       setIsCreating(false);
-      toast.success('Workspace created successfully!');
+      if (newWs) {
+        setCurrentWorkspace(newWs);
+      }
+      toast.success("Workspace created successfully!");
     },
     onError: (err: unknown) => {
-      const msg = getApiErrorMessage(err, 'Failed to create workspace');
+      const msg = getApiErrorMessage(err, "Failed to create workspace");
       setCreateError(msg);
+      toast.error(msg);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (workspaceId: string) =>
+      workspaceApi.deleteWorkspace(workspaceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-workspaces"] });
+      toast.success("Workspace deleted successfully.");
+    },
+    onError: (err: unknown) => {
+      const msg = getApiErrorMessage(err, "Failed to delete workspace.");
       toast.error(msg);
     },
   });
@@ -56,9 +78,13 @@ export default function WorkspacesListPage() {
           </p>
         </div>
 
-        <Button onClick={() => setIsCreating(!isCreating)} size="sm" className="gap-2">
+        <Button
+          onClick={() => setIsCreating(!isCreating)}
+          size="sm"
+          className="gap-2"
+        >
           <Plus className="h-4 w-4" />
-          {isCreating ? 'Cancel' : 'New Workspace'}
+          {isCreating ? "Cancel" : "New Workspace"}
         </Button>
       </div>
 
@@ -67,7 +93,7 @@ export default function WorkspacesListPage() {
           <CardHeader>
             <CardTitle className="text-base">Create Workspace</CardTitle>
             <CardDescription>
-              Workspaces isolate documents, vector embeddings, and conversations.
+              Workspaces isolate documents, and conversations.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -97,8 +123,8 @@ export default function WorkspacesListPage() {
                       setSlug(
                         e.target.value
                           .toLowerCase()
-                          .replace(/\s+/g, '-')
-                          .replace(/[^a-z0-9-]/g, '')
+                          .replace(/\s+/g, "-")
+                          .replace(/[^a-z0-9-]/g, ""),
                       );
                     }
                   }}
@@ -122,7 +148,9 @@ export default function WorkspacesListPage() {
                   size="sm"
                   disabled={!name || !slug || createMutation.isPending}
                 >
-                  {createMutation.isPending ? 'Creating...' : 'Create Workspace'}
+                  {createMutation.isPending
+                    ? "Creating..."
+                    : "Create Workspace"}
                 </Button>
               </div>
             </form>
@@ -140,7 +168,8 @@ export default function WorkspacesListPage() {
           <Database className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
           <h3 className="text-base font-semibold">No workspaces found</h3>
           <p className="text-xs text-muted-foreground mt-1 mb-4">
-            Create your first workspace to start uploading documents and asking questions.
+            Create your first workspace to start uploading documents and asking
+            questions.
           </p>
           <Button onClick={() => setIsCreating(true)} size="sm">
             Create Workspace
@@ -148,39 +177,64 @@ export default function WorkspacesListPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {workspaces.map((ws: Workspace) => (
-            <Card
-              key={ws.id}
-              className="hover:border-primary/50 transition-colors flex flex-col justify-between"
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <Database className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-[11px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">
-                    {ws.slug}
-                  </span>
-                </div>
-                <CardTitle className="text-base mt-2">{ws.name}</CardTitle>
-                <CardDescription className="text-xs">
-                  Created {new Date(ws.createdAt).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-between"
-                  onClick={() => setCurrentWorkspace(ws)}
-                >
-                  <Link href={`/workspaces/${ws.id}`}>
-                    <span>Enter Workspace</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {workspaces.map((ws: Workspace) => {
+            const isOwner = ws.role === "OWNER";
+
+            return (
+              <Card
+                key={ws.id}
+                className="hover:border-primary/50 transition-colors flex flex-col justify-between"
+              >
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <Database className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-[11px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                      {ws.slug}
+                    </span>
+                  </div>
+                  <CardTitle className="text-base mt-2">{ws.name}</CardTitle>
+                  <CardDescription className="text-xs">
+                    Created {new Date(ws.createdAt).toLocaleDateString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0 flex items-center gap-2">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 justify-between"
+                    onClick={() => setCurrentWorkspace(ws)}
+                  >
+                    <Link href={`/workspaces/${ws.slug || ws.id}`}>
+                      <span>Enter Workspace</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+
+                  {isOwner && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      title="Delete Workspace"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Are you sure you want to delete "${ws.name}"? This cannot be undone.`,
+                          )
+                        ) {
+                          deleteMutation.mutate(ws.id);
+                        }
+                      }}
+                      disabled={deleteMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

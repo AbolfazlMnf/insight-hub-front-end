@@ -6,7 +6,7 @@ import { documentApi } from '../api';
 import { getApiErrorMessage } from '@/shared/api/client';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
-import { Upload, X, FileText, Loader2 } from 'lucide-react';
+import { Upload, X, FileText, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface UploadModalProps {
@@ -28,10 +28,23 @@ export function UploadDocumentModal({
 
   const uploadMutation = useMutation({
     mutationFn: () => {
-      if (!file || !title) throw new Error('File and title are required');
+      if (!workspaceId || workspaceId === 'default') {
+        throw new Error('Please select a valid workspace first.');
+      }
+      if (!file) {
+        throw new Error('Please select a file to upload.');
+      }
+      if (!title.trim()) {
+        throw new Error('Document title cannot be empty.');
+      }
+      // Check 20MB limit
+      if (file.size > 20 * 1024 * 1024) {
+        throw new Error('File size exceeds the 20 MB limit.');
+      }
+
       return documentApi.uploadDocument({
         file,
-        title,
+        title: title.trim(),
         workspaceId,
       });
     },
@@ -42,11 +55,11 @@ export function UploadDocumentModal({
       setFile(null);
       setTitle('');
       setError(null);
-      toast.success('Document uploaded and queued for processing!');
+      toast.success('Document uploaded and scheduled for processing!');
       onClose();
     },
     onError: (err: unknown) => {
-      const msg = getApiErrorMessage(err, 'Upload failed');
+      const msg = getApiErrorMessage(err, 'Failed to upload document.');
       setError(msg);
       toast.error(msg);
     },
@@ -55,7 +68,7 @@ export function UploadDocumentModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
       <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg">
         <div className="flex items-center justify-between pb-4 border-b border-border">
           <h2 className="text-base font-semibold">Upload Knowledge Document</h2>
@@ -70,13 +83,15 @@ export function UploadDocumentModal({
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            setError(null);
             uploadMutation.mutate();
           }}
           className="space-y-4 pt-4"
         >
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-xs text-destructive">
-              {error}
+            <div className="rounded-md bg-destructive/10 p-3 text-xs text-destructive flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+              <span>{error}</span>
             </div>
           )}
 
@@ -95,7 +110,7 @@ export function UploadDocumentModal({
 
           <div>
             <label className="text-xs font-medium text-foreground block mb-1.5">
-              File (PDF or Plain Text)
+              File (PDF, TXT, or Markdown)
             </label>
             <div className="flex items-center justify-center w-full">
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/30 transition-colors">
@@ -104,15 +119,18 @@ export function UploadDocumentModal({
                     <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                       <FileText className="h-5 w-5 text-primary" />
                       <span className="truncate max-w-[200px]">{file.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({(file.size / (1024 * 1024)).toFixed(1)} MB)
+                      </span>
                     </div>
                   ) : (
                     <>
                       <Upload className="w-6 h-6 mb-2 text-muted-foreground" />
                       <p className="text-xs text-foreground font-medium">
-                        Click to select or drag and drop
+                        Click to upload or drag and drop
                       </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        PDF or TXT up to 25MB
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        PDF, TXT and MD files up to 20 MB
                       </p>
                     </>
                   )}
@@ -120,7 +138,7 @@ export function UploadDocumentModal({
                 <input
                   type="file"
                   className="hidden"
-                  accept=".pdf,.txt,.md"
+                  accept=".pdf,.txt,.md,text/plain,application/pdf,text/markdown"
                   onChange={(e) => {
                     const selected = e.target.files?.[0];
                     if (selected) {
@@ -148,12 +166,12 @@ export function UploadDocumentModal({
             <Button
               type="submit"
               size="sm"
-              disabled={!file || !title || uploadMutation.isPending}
+              disabled={!file || !title.trim() || uploadMutation.isPending}
             >
               {uploadMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
+                  Uploading & Queuing...
                 </>
               ) : (
                 'Upload & Ingest'
