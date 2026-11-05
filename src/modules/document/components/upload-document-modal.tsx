@@ -7,6 +7,7 @@ import { getApiErrorMessage } from '@/shared/api/client';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Upload, X, FileText, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface UploadModalProps {
   workspaceId: string;
@@ -41,11 +42,13 @@ export function UploadDocumentModal({
       setFile(null);
       setTitle('');
       setError(null);
+      toast.success('Document uploaded and queued for processing!');
       onClose();
     },
     onError: (err: unknown) => {
       const msg = getApiErrorMessage(err, 'Upload failed');
       setError(msg);
+      toast.error(msg);
     },
   });
 

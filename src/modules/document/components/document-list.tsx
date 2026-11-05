@@ -16,6 +16,8 @@ import {
   HardDrive,
 } from 'lucide-react';
 import { UploadDocumentModal } from './upload-document-modal';
+import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/shared/api/client';
 
 export function DocumentList({ workspaceId }: { workspaceId: string }) {
   const [search, setSearch] = useState('');
@@ -46,6 +48,10 @@ export function DocumentList({ workspaceId }: { workspaceId: string }) {
       queryClient.invalidateQueries({
         queryKey: ['workspace-documents', workspaceId],
       });
+      toast.success('Retrying document processing...');
+    },
+    onError: (err: unknown) => {
+      toast.error(getApiErrorMessage(err, 'Failed to retry document processing'));
     },
   });
 
@@ -55,6 +61,10 @@ export function DocumentList({ workspaceId }: { workspaceId: string }) {
       queryClient.invalidateQueries({
         queryKey: ['workspace-documents', workspaceId],
       });
+      toast.success('Document deleted successfully');
+    },
+    onError: (err: unknown) => {
+      toast.error(getApiErrorMessage(err, 'Failed to delete document'));
     },
   });
 

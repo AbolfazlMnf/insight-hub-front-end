@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/sha
 import Link from 'next/link';
 import { Database, Plus, ArrowRight, Loader2 } from 'lucide-react';
 import { Workspace } from '@/modules/workspace/types';
+import { toast } from 'sonner';
 
 export default function WorkspacesListPage() {
   const [name, setName] = useState('');
@@ -34,10 +35,12 @@ export default function WorkspacesListPage() {
       setSlug('');
       setCreateError(null);
       setIsCreating(false);
+      toast.success('Workspace created successfully!');
     },
     onError: (err: unknown) => {
       const msg = getApiErrorMessage(err, 'Failed to create workspace');
       setCreateError(msg);
+      toast.error(msg);
     },
   });
 

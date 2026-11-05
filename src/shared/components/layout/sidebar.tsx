@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/modules/auth/store';
 import { useWorkspaceStore } from '@/modules/workspace/store';
+import { toast } from 'sonner';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -116,7 +117,10 @@ export function Sidebar() {
           </span>
         </div>
         <button
-          onClick={logout}
+          onClick={() => {
+            logout();
+            toast.info('Signed out successfully');
+          }}
           title="Sign Out"
           className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
         >

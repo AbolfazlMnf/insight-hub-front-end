@@ -1,27 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import { authApi } from "@/modules/auth/api";
-import { useAuthStore } from "@/modules/auth/store";
-import { getApiErrorMessage } from "@/shared/api/client";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import { authApi } from '@/modules/auth/api';
+import { useAuthStore } from '@/modules/auth/store';
+import { getApiErrorMessage } from '@/shared/api/client';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/shared/components/ui/card";
-import Link from "next/link";
-import { Loader2 } from "lucide-react";
+} from '@/shared/components/ui/card';
+import Link from 'next/link';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { setAuth } = useAuthStore();
@@ -29,29 +31,30 @@ export default function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: () => authApi.login({ email, password }),
     onSuccess: async (data) => {
-      // Decode JWT payload or basic user object
       try {
-        const payloadBase64 = data.accessToken.split(".")[1];
+        const payloadBase64 = data.accessToken.split('.')[1];
         const payload = JSON.parse(atob(payloadBase64));
         setAuth(data.accessToken, {
           id: payload.id,
           email,
-          username: email.split("@")[0],
-          role: payload.role || "USER",
+          username: email.split('@')[0],
+          role: payload.role || 'USER',
         });
       } catch {
         setAuth(data.accessToken, {
-          id: "user",
+          id: 'user',
           email,
-          username: email.split("@")[0],
-          role: "USER",
+          username: email.split('@')[0],
+          role: 'USER',
         });
       }
-      router.push("/");
+      toast.success('Signed in successfully!');
+      router.push('/');
     },
     onError: (err: unknown) => {
-      const msg = getApiErrorMessage(err, "Invalid credentials");
+      const msg = getApiErrorMessage(err, 'Invalid credentials');
       setError(msg);
+      toast.error(msg);
     },
   });
 
@@ -96,13 +99,29 @@ export default function LoginPage() {
 
             <div>
               <label className="text-xs font-medium block mb-1">Password</label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <Button
@@ -116,16 +135,13 @@ export default function LoginPage() {
                   Signing in...
                 </>
               ) : (
-                "Sign In"
+                'Sign In'
               )}
             </Button>
 
             <div className="text-center text-xs text-muted-foreground pt-2">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="text-primary hover:underline font-medium"
-              >
+              Don&apos;t have an account?{' '}
+              <Link href="/register" className="text-primary hover:underline font-medium">
                 Sign up
               </Link>
             </div>
