@@ -1,10 +1,9 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/shared/components/layout/sidebar';
 import { useAuthStore } from '@/modules/auth/store';
-import { Loader2 } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -13,28 +12,14 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
-  const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
     // Check client-side authentication
     const state = useAuthStore.getState();
     if (!state.isAuthenticated || !state.token) {
       router.replace('/login');
-    } else {
-      setIsVerifying(false);
     }
   }, [router, isAuthenticated, token]);
-
-  if (isVerifying && !token) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-sm font-medium">Verifying authorization...</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">

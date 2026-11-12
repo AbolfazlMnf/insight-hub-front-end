@@ -20,6 +20,7 @@ import { useAuthStore } from '@/modules/auth/store';
 import { useWorkspaceStore } from '@/modules/workspace/store';
 import { workspaceApi } from '@/modules/workspace/api';
 import { Button } from '@/shared/components/ui/button';
+import { ThemeToggle } from '@/shared/components/ui/theme-toggle';
 import { toast } from 'sonner';
 
 export function Sidebar() {
@@ -172,14 +173,17 @@ export function Sidebar() {
               {user?.email || ''}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowLogoutModal(true)}
-            title="Sign Out"
-            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setShowLogoutModal(true)}
+              title="Sign Out"
+              className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </aside>
 

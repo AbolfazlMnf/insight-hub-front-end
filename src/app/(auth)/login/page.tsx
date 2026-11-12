@@ -17,6 +17,7 @@ import {
 } from "@/shared/components/ui/card";
 import Link from "next/link";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/shared/components/ui/theme-toggle";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -63,7 +64,10 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-muted/20">
+    <div className="relative flex min-h-screen items-center justify-center p-4 bg-muted/20">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-sm border-border bg-card shadow-sm">
         <CardHeader className="text-center pb-4">
           <div className="h-9 w-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm tracking-wide mx-auto mb-2">
