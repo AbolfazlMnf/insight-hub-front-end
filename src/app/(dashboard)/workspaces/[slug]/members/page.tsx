@@ -142,11 +142,11 @@ function MembersContent({
     workspace?.role === 'OWNER' || workspace?.role === 'ADMIN';
 
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto w-full space-y-4 sm:space-y-6 overflow-y-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-border">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Members & Roles</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Members & Roles</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Manage team access and permissions for {workspace?.name}.
           </p>
         </div>
@@ -155,7 +155,7 @@ function MembersContent({
           <Button
             size="sm"
             onClick={() => setIsAddOpen(!isAddOpen)}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto min-h-[44px]"
           >
             <UserPlus className="h-4 w-4" />
             {isAddOpen ? 'Cancel' : 'Add Member'}
@@ -165,13 +165,13 @@ function MembersContent({
 
       {isAddOpen && (
         <Card className="border-primary/40 bg-muted/20">
-          <CardHeader>
-            <CardTitle className="text-base">Add Workspace Member</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="text-base sm:text-lg">Add Workspace Member</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Assign role privileges to a user by their user ID.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-2">
             {addError && (
               <div className="rounded-md bg-destructive/10 p-2.5 text-xs text-destructive mb-4">
                 {addError}
@@ -183,7 +183,7 @@ function MembersContent({
                 setAddError(null);
                 addMemberMutation.mutate();
               }}
-              className="space-y-4 max-w-md"
+              className="space-y-4 max-w-full sm:max-w-md"
             >
               <div>
                 <label className="text-xs font-medium block mb-1">
@@ -193,6 +193,7 @@ function MembersContent({
                   placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
                   value={targetUserId}
                   onChange={(e) => setTargetUserId(e.target.value)}
+                  className="min-h-[44px]"
                   required
                 />
               </div>
@@ -203,7 +204,7 @@ function MembersContent({
                   aria-label="Member role"
                   value={role}
                   onChange={(e) => setRole(e.target.value as WorkspaceRole)}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+                  className="w-full h-11 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="MEMBER">MEMBER (Read & Ask Knowledge)</option>
                   {workspace?.role === 'OWNER' && (
@@ -216,6 +217,7 @@ function MembersContent({
                 <Button
                   type="submit"
                   size="sm"
+                  className="w-full sm:w-auto min-h-[44px]"
                   disabled={!targetUserId || addMemberMutation.isPending}
                 >
                   {addMemberMutation.isPending ? 'Adding...' : 'Confirm Add'}
@@ -227,8 +229,8 @@ function MembersContent({
       )}
 
       {isMembersLoading ? (
-        <div className="flex items-center justify-center p-16 gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
+        <div className="flex items-center justify-center p-12 sm:p-16 gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
           Loading members...
         </div>
       ) : membersError ? (
@@ -239,14 +241,91 @@ function MembersContent({
           </p>
         </div>
       ) : !members || members.length === 0 ? (
-        <div className="p-16 text-center border border-dashed border-border rounded-lg">
+        <div className="p-12 sm:p-16 text-center border border-dashed border-border rounded-lg">
           <Users className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
           <h3 className="text-base font-semibold">No members found</h3>
         </div>
       ) : (
         <div className="rounded-lg border border-border bg-card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          {/* Mobile View: Member Cards */}
+          <div className="md:hidden divide-y divide-border">
+            {members.map((member) => {
+              const memberUserId = member.user?.id || member.userId || '';
+              const isCurrent = memberUserId === currentUser?.id;
+              const isOwner = member.role === 'OWNER';
+
+              return (
+                <div key={memberUserId || member.id} className="p-4 space-y-2.5 hover:bg-muted/20 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="font-semibold text-sm text-foreground truncate">
+                        {member.user?.username || member.user?.name || memberUserId.slice(0, 8)}
+                      </span>
+                      {isCurrent && (
+                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                          You
+                        </span>
+                      )}
+                    </div>
+                    <Badge
+                      variant={
+                        member.role === 'OWNER'
+                          ? 'default'
+                          : member.role === 'ADMIN'
+                          ? 'secondary'
+                          : 'outline'
+                      }
+                    >
+                      {member.role}
+                    </Badge>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground truncate">
+                    {member.user?.email || 'No email provided'}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-1.5 border-t border-border/50">
+                    <span>Joined {new Date(member.createdAt).toLocaleDateString()}</span>
+
+                    {isOwnerOrAdmin && !isOwner && !isCurrent && (
+                      <div className="flex items-center gap-2">
+                        {workspace?.role === 'OWNER' && (
+                          <select
+                            aria-label="Change member role"
+                            value={member.role}
+                            onChange={(e) =>
+                              changeRoleMutation.mutate({
+                                targetUserId: memberUserId,
+                                role: e.target.value as WorkspaceRole,
+                              })
+                            }
+                            className="h-8 text-xs rounded border border-border bg-background px-2"
+                          >
+                            <option value="MEMBER">MEMBER</option>
+                            <option value="ADMIN">ADMIN</option>
+                          </select>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeMemberMutation.mutate(memberUserId)}
+                          className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive"
+                          title="Remove member"
+                          aria-label="Remove member"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop View: Data Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-sm min-w-[550px]">
               <thead className="bg-muted/40 border-b border-border text-xs uppercase text-muted-foreground font-medium">
                 <tr>
                   <th className="px-4 py-3">Member</th>
@@ -307,7 +386,7 @@ function MembersContent({
                                       role: e.target.value as WorkspaceRole,
                                     })
                                   }
-                                  className="h-7 text-xs rounded border border-border bg-background px-2"
+                                  className="h-8 text-xs rounded border border-border bg-background px-2"
                                 >
                                   <option value="MEMBER">MEMBER</option>
                                   <option value="ADMIN">ADMIN</option>
@@ -319,7 +398,7 @@ function MembersContent({
                                 onClick={() =>
                                   removeMemberMutation.mutate(memberUserId)
                                 }
-                                className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                                 title="Remove member"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />

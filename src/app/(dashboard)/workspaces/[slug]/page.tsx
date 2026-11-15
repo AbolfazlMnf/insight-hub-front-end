@@ -111,20 +111,20 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
     documentsData?.data?.filter((d) => d.status === "READY").length || 0;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto w-full space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8 overflow-y-auto">
       {/* Title Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-border">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             {workspace?.name || "Workspace Dashboard"}
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Knowledge base indexing and AI conversational assistant.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="w-full sm:w-auto min-h-[44px]">
             <Link href={`/workspaces/${workspaceSlug}/chat`} className="gap-2">
               <MessageSquareCode className="h-4 w-4" />
               Open Assistant
@@ -134,16 +134,16 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-5 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">
               Total Documents
             </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-4 sm:p-5 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">
               {isDocsLoading ? "..." : totalDocs}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -153,27 +153,27 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
+          <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-5 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">
               Vector Store (Qdrant)
             </CardTitle>
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Connected</div>
+          <CardContent className="p-4 sm:p-5 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">Connected</div>
             <p className="text-xs text-muted-foreground mt-1">
               Semantic embeddings active
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Your Role</CardTitle>
+        <Card className="sm:col-span-2 lg:col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-5 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium">Your Role</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-4 sm:p-5 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">
               {workspace?.role || "MEMBER"}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -184,23 +184,23 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
       </div>
 
       {/* Quick Access Sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-        <Card className="hover:border-primary/40 transition-colors">
-          <CardHeader>
-            <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-2">
+        <Card className="hover:border-primary/40 transition-colors flex flex-col justify-between">
+          <CardHeader className="p-4 sm:p-6 pb-3">
+            <div className="flex items-center gap-2 text-primary font-semibold text-xs sm:text-sm">
               <FileText className="h-4 w-4" />
               Knowledge Documents
             </div>
-            <CardTitle className="text-base mt-2">
+            <CardTitle className="text-base sm:text-lg mt-2">
               Manage & Index Files
             </CardTitle>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               Upload PDF and text files. Each document is chunked, embedded with
               AI vectors, and stored in Qdrant for fast semantic retrieval.
             </p>
           </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" size="sm" className="gap-2">
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <Button asChild variant="outline" size="sm" className="gap-2 w-full sm:w-auto min-h-[44px]">
               <Link href={`/workspaces/${workspaceSlug}/documents`}>
                 <span>Manage Documents</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -209,14 +209,14 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
           </CardContent>
         </Card>
 
-        <Card className="hover:border-primary/40 transition-colors">
-          <CardHeader>
-            <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+        <Card className="hover:border-primary/40 transition-colors flex flex-col justify-between">
+          <CardHeader className="p-4 sm:p-6 pb-3">
+            <div className="flex items-center gap-2 text-primary font-semibold text-xs sm:text-sm">
               <MessageSquareCode className="h-4 w-4" />
               Agentic Assistant
             </div>
-            <CardTitle className="text-base mt-2">Ask Knowledge Base</CardTitle>
-            <p className="text-xs text-muted-foreground">
+            <CardTitle className="text-base sm:text-lg mt-2">Ask Knowledge Base</CardTitle>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               Query your indexed workspace with streaming responses. The agent
               retrieves relevant chunks and provides answers with exact source
               citations.
@@ -288,10 +288,11 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
               conversations.
             </p>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-3 border-t border-border">
               <Button
                 variant="outline"
                 size="sm"
+                className="min-h-[44px]"
                 onClick={() => setIsDeleteModalOpen(false)}
                 disabled={deleteWorkspaceMutation.isPending}
               >
@@ -300,7 +301,7 @@ function OverviewContent({ params }: { params: Promise<{ slug: string }> }) {
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2"
+                className="gap-2 min-h-[44px]"
                 onClick={() => deleteWorkspaceMutation.mutate()}
                 disabled={deleteWorkspaceMutation.isPending}
               >

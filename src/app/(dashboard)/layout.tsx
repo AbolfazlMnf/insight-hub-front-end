@@ -2,8 +2,12 @@
 
 import React, { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Menu } from 'lucide-react';
 import { Sidebar } from '@/shared/components/layout/sidebar';
 import { useAuthStore } from '@/modules/auth/store';
+import { useWorkspaceStore } from '@/modules/workspace/store';
+import { useUiStore } from '@/shared/stores/ui-store';
+import { ThemeToggle } from '@/shared/components/ui/theme-toggle';
 
 export default function DashboardLayout({
   children,
@@ -12,6 +16,8 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { currentWorkspace } = useWorkspaceStore();
+  const { toggleMobileSidebar } = useUiStore();
 
   useEffect(() => {
     // Check client-side authentication
@@ -22,15 +28,45 @@ export default function DashboardLayout({
   }, [router, isAuthenticated, token]);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-background">
+      {/* Mobile Top Navigation Header */}
+      <header className="md:hidden h-13 border-b border-border bg-card px-3 flex items-center justify-between shrink-0 z-30">
+        <div className="flex items-center gap-2 min-w-0">
+          <button
+            type="button"
+            onClick={toggleMobileSidebar}
+            aria-label="Open navigation menu"
+            className="h-10 w-10 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors shrink-0"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <div className="flex items-center gap-2 truncate">
+            <div className="h-6 w-6 rounded bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs tracking-wide shrink-0">
+              IH
+            </div>
+            <span className="font-semibold text-xs sm:text-sm truncate">
+              {currentWorkspace?.name || 'Insight Hub'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 shrink-0">
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* Persistent Sidebar on Desktop & Off-Canvas Drawer on Mobile */}
       <Suspense
         fallback={
-          <aside className="w-64 border-r border-border bg-card flex flex-col h-screen shrink-0 animate-pulse" />
+          <aside className="hidden md:flex md:w-64 md:border-r md:border-border md:bg-card md:flex-col md:h-screen md:shrink-0 animate-pulse" />
         }
       >
         <Sidebar />
       </Suspense>
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 h-[calc(100dvh-3.25rem)] md:h-screen overflow-hidden">
         <Suspense
           fallback={
             <div className="p-8 text-sm text-muted-foreground flex items-center justify-center h-full">

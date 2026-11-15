@@ -65,7 +65,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4 bg-muted/20">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
         <ThemeToggle />
       </div>
       <Card className="w-full max-w-sm border-border bg-card shadow-sm">
@@ -73,7 +73,7 @@ export default function LoginPage() {
           <div className="h-9 w-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm tracking-wide mx-auto mb-2">
             IH
           </div>
-          <CardTitle className="text-xl">Sign in to Insight Hub</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Sign in to Insight Hub</CardTitle>
           <CardDescription className="text-xs">
             Enter your credentials to access your workspaces
           </CardDescription>
@@ -101,6 +101,7 @@ export default function LoginPage() {
                 placeholder="developer@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="min-h-[44px] text-base sm:text-sm"
                 required
               />
             </div>
@@ -113,13 +114,13 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
+                  className="pr-12 min-h-[44px] text-base sm:text-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                  className="absolute right-0 top-0 bottom-0 px-3.5 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center min-w-[44px]"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -134,7 +135,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full min-h-[44px]"
               disabled={loginMutation.isPending}
             >
               {loginMutation.isPending ? (
@@ -151,7 +152,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-medium inline-block py-1"
               >
                 Sign up
               </Link>

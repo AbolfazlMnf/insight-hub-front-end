@@ -147,6 +147,9 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
     }
     setSelectedConversationId(convId);
     loadConversationMessages(convId);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleNewChat = () => {
@@ -156,6 +159,9 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
     }
     setSelectedConversationId(undefined);
     setMessages([]);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleSend = async (customPrompt?: string) => {
@@ -343,11 +349,20 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-background">
-      {/* Conversations History Sidebar */}
+    <div className="flex h-full w-full overflow-hidden bg-background relative">
+      {/* Mobile Backdrop for Conversations Sidebar */}
       {isSidebarOpen && (
-        <aside className="w-64 border-r border-border bg-card flex flex-col h-full shrink-0 transition-all duration-200">
-          <div className="h-14 border-b border-border px-3 flex items-center justify-between">
+        <div
+          className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Conversations History Sidebar (Overlay on mobile, Static column on desktop) */}
+      {isSidebarOpen && (
+        <aside className="fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] border-r border-border bg-card shadow-2xl flex flex-col h-full md:static md:w-64 lg:w-72 md:border-r md:bg-card md:shadow-none shrink-0 transition-all duration-200">
+          <div className="h-13 sm:h-14 border-b border-border px-3 flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Conversations
             </span>
@@ -356,7 +371,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                 size="sm"
                 variant="outline"
                 onClick={handleNewChat}
-                className="h-7 px-2 gap-1 text-xs"
+                className="h-8 px-2.5 gap-1 text-xs min-h-[36px]"
                 title="Start a new chat"
               >
                 <Plus className="h-3.5 w-3.5" />
@@ -365,8 +380,9 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen(false)}
-                className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                className="h-9 w-9 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 title="Close Conversations Sidebar"
+                aria-label="Close Conversations Sidebar"
               >
                 <PanelLeftClose className="h-4 w-4" />
               </button>
@@ -390,7 +406,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                   <div
                     key={conv.id}
                     onClick={() => handleSelectConversation(conv.id)}
-                    className={`group flex items-center justify-between px-2.5 py-2 rounded-md text-xs cursor-pointer transition-colors ${
+                    className={`group flex items-center justify-between px-3 py-2.5 rounded-md text-xs cursor-pointer transition-colors min-h-[44px] ${
                       isSelected
                         ? 'bg-secondary text-foreground font-medium'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -409,10 +425,11 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                         e.stopPropagation();
                         deleteConversationMutation.mutate(conv.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 hover:text-destructive p-1 rounded transition-opacity shrink-0"
+                      className="opacity-60 md:opacity-0 group-hover:opacity-100 hover:text-destructive p-2 rounded transition-opacity shrink-0"
                       title="Delete conversation"
+                      aria-label="Delete conversation"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 );
@@ -425,18 +442,18 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative">
         {/* Chat Header */}
-        <div className="h-14 border-b border-border px-4 flex items-center justify-between shrink-0 bg-card">
-          <div className="flex items-center gap-2">
+        <div className="h-13 sm:h-14 border-b border-border px-3 sm:px-4 flex items-center justify-between shrink-0 bg-card">
+          <div className="flex items-center gap-2 min-w-0">
             {!isSidebarOpen && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsSidebarOpen(true)}
-                className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                className="h-9 gap-1.5 text-xs text-muted-foreground hover:text-foreground shrink-0 min-h-[40px] px-2.5"
                 title="Open Conversations Sidebar"
               >
                 <PanelLeftOpen className="h-4 w-4" />
-                <span>Conversations</span>
+                <span className="hidden sm:inline">Conversations</span>
               </Button>
             )}
 
@@ -444,16 +461,17 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
               <button
                 type="button"
                 onClick={() => setIsSidebarOpen(false)}
-                className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors mr-1"
+                className="h-9 w-9 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors mr-1 shrink-0"
                 title="Hide Conversations Sidebar"
+                aria-label="Hide Conversations Sidebar"
               >
                 <PanelLeftClose className="h-4 w-4" />
               </button>
             )}
 
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <h2 className="text-sm font-semibold truncate">
+            <div className="flex items-center gap-2 truncate">
+              <Sparkles className="h-4 w-4 text-primary shrink-0" />
+              <h2 className="text-xs sm:text-sm font-semibold truncate">
                 Agentic Assistant
               </h2>
             </div>
@@ -463,10 +481,10 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
             size="sm"
             variant="ghost"
             onClick={handleNewChat}
-            className="text-xs gap-1.5 h-8"
+            className="text-xs gap-1.5 h-9 min-h-[40px] px-2.5 shrink-0"
           >
             <Plus className="h-3.5 w-3.5" />
-            New Chat
+            <span className="hidden sm:inline">New Chat</span>
           </Button>
         </div>
 
@@ -474,7 +492,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
         <div
           ref={messagesContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0"
+          className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 min-h-0"
         >
           {isLoadingDetail ? (
             <div className="flex items-center justify-center h-full text-xs text-muted-foreground gap-2">
@@ -524,15 +542,16 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
           <button
             type="button"
             onClick={scrollToBottom}
-            className="absolute bottom-20 right-6 z-10 h-8 w-8 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+            className="absolute bottom-20 right-4 sm:right-6 z-10 h-9 w-9 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
             title="Scroll to bottom"
+            aria-label="Scroll to bottom"
           >
             <ArrowDown className="h-4 w-4" />
           </button>
         )}
 
         {/* Input Form with AI Elements styling */}
-        <div className="p-4 border-t border-border bg-card shrink-0">
+        <div className="p-2.5 sm:p-4 border-t border-border bg-card shrink-0">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -542,7 +561,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
           >
             <div className="flex-1 relative rounded-xl border border-input bg-background focus-within:ring-1 focus-within:ring-ring transition-all">
               <textarea
-                placeholder="Ask questions about your workspace documents (Shift+Enter for newline)..."
+                placeholder="Ask about workspace documents (Enter to send)..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -553,7 +572,7 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                 }}
                 disabled={isStreaming}
                 rows={1}
-                className="w-full resize-none bg-transparent px-3.5 py-2.5 text-sm focus:outline-hidden disabled:opacity-50 min-h-[42px] max-h-32 text-foreground placeholder:text-muted-foreground"
+                className="w-full resize-none bg-transparent px-3 py-2.5 text-base sm:text-sm focus:outline-hidden disabled:opacity-50 min-h-[44px] max-h-32 text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
@@ -563,20 +582,20 @@ export function ChatInterface({ workspaceId }: { workspaceId: string }) {
                 variant="destructive"
                 size="sm"
                 onClick={handleStop}
-                className="h-[42px] px-3 gap-1.5 rounded-xl shrink-0"
+                className="h-[44px] px-3 gap-1.5 rounded-xl shrink-0 min-h-[44px]"
               >
-                <Square className="h-3.5 w-3.5" />
-                <span>Stop</span>
+                <Square className="h-4 w-4" />
+                <span className="hidden sm:inline">Stop</span>
               </Button>
             ) : (
               <Button
                 type="submit"
                 size="sm"
                 disabled={!input.trim()}
-                className="h-[42px] px-4 gap-1.5 rounded-xl shrink-0"
+                className="h-[44px] px-3 sm:px-4 gap-1.5 rounded-xl shrink-0 min-h-[44px]"
               >
-                <Send className="h-3.5 w-3.5" />
-                <span>Send</span>
+                <Send className="h-4 w-4" />
+                <span className="hidden sm:inline">Send</span>
               </Button>
             )}
           </form>

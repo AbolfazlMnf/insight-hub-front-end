@@ -68,13 +68,14 @@ export function UploadDocumentModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg">
-        <div className="flex items-center justify-between pb-4 border-b border-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-4 sm:p-6 shadow-lg my-auto animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-border">
           <h2 className="text-base font-semibold">Upload Knowledge Document</h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-muted-foreground hover:bg-muted"
+            aria-label="Close dialog"
+            className="rounded-md p-2 -mr-1 text-muted-foreground hover:bg-muted min-h-[40px] min-w-[40px] flex items-center justify-center"
           >
             <X className="h-4 w-4" />
           </button>
@@ -104,6 +105,7 @@ export function UploadDocumentModal({
               placeholder="e.g. Architecture Documentation v2"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              className="min-h-[44px]"
               required
             />
           </div>
@@ -117,9 +119,9 @@ export function UploadDocumentModal({
                 <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
                   {file ? (
                     <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <FileText className="h-5 w-5 text-primary" />
+                      <FileText className="h-5 w-5 text-primary shrink-0" />
                       <span className="truncate max-w-[200px]">{file.name}</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground shrink-0">
                         ({(file.size / (1024 * 1024)).toFixed(1)} MB)
                       </span>
                     </div>
@@ -153,13 +155,14 @@ export function UploadDocumentModal({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-border/50">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={onClose}
               disabled={uploadMutation.isPending}
+              className="min-h-[44px] w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -167,6 +170,7 @@ export function UploadDocumentModal({
               type="submit"
               size="sm"
               disabled={!file || !title.trim() || uploadMutation.isPending}
+              className="min-h-[44px] w-full sm:w-auto"
             >
               {uploadMutation.isPending ? (
                 <>

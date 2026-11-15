@@ -48,7 +48,7 @@ export default function RegisterPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4 bg-muted/20">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
         <ThemeToggle />
       </div>
       <Card className="w-full max-w-sm border-border bg-card shadow-sm">
@@ -56,7 +56,7 @@ export default function RegisterPage() {
           <div className="h-9 w-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm tracking-wide mx-auto mb-2">
             IH
           </div>
-          <CardTitle className="text-xl">Create Account</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Create Account</CardTitle>
           <CardDescription className="text-xs">
             Register to join and create knowledge workspaces
           </CardDescription>
@@ -86,6 +86,7 @@ export default function RegisterPage() {
                 placeholder="Alex Developer"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="min-h-[44px] text-base sm:text-sm"
               />
             </div>
 
@@ -96,6 +97,7 @@ export default function RegisterPage() {
                 placeholder="alexdev"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                className="min-h-[44px] text-base sm:text-sm"
                 required
               />
             </div>
@@ -107,6 +109,7 @@ export default function RegisterPage() {
                 placeholder="alex@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="min-h-[44px] text-base sm:text-sm"
                 required
               />
             </div>
@@ -119,13 +122,13 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
+                  className="pr-12 min-h-[44px] text-base sm:text-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                  className="absolute right-0 top-0 bottom-0 px-3.5 text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center min-w-[44px]"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -140,7 +143,7 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full min-h-[44px]"
               disabled={registerMutation.isPending}
             >
               {registerMutation.isPending ? (
@@ -157,7 +160,7 @@ export default function RegisterPage() {
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-medium inline-block py-1"
               >
                 Sign in
               </Link>

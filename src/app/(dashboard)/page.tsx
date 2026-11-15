@@ -69,11 +69,11 @@ export default function WorkspacesListPage() {
   const workspaces = data?.data || [];
 
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto w-full space-y-6 sm:space-y-8 overflow-y-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-border">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Your Workspaces</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Your Workspaces</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Select an isolated knowledge workspace or create a new one.
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function WorkspacesListPage() {
         <Button
           onClick={() => setIsCreating(!isCreating)}
           size="sm"
-          className="gap-2"
+          className="gap-2 w-full sm:w-auto min-h-[44px] shrink-0"
         >
           <Plus className="h-4 w-4" />
           {isCreating ? "Cancel" : "New Workspace"}
@@ -90,13 +90,13 @@ export default function WorkspacesListPage() {
 
       {isCreating && (
         <Card className="border-primary/40 bg-muted/20">
-          <CardHeader>
-            <CardTitle className="text-base">Create Workspace</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="text-base sm:text-lg">Create Workspace</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Workspaces isolate documents, and conversations.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-2">
             {createError && (
               <div className="rounded-md bg-destructive/10 p-2.5 text-xs text-destructive mb-4">
                 {createError}
@@ -108,7 +108,7 @@ export default function WorkspacesListPage() {
                 setCreateError(null);
                 createMutation.mutate();
               }}
-              className="space-y-4 max-w-md"
+              className="space-y-4 max-w-full sm:max-w-md"
             >
               <div>
                 <label className="text-xs font-medium block mb-1">
@@ -128,6 +128,7 @@ export default function WorkspacesListPage() {
                       );
                     }
                   }}
+                  className="min-h-[44px]"
                   required
                 />
               </div>
@@ -138,6 +139,7 @@ export default function WorkspacesListPage() {
                   placeholder="e.g. engineering-knowledge"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
+                  className="min-h-[44px]"
                   required
                 />
               </div>
@@ -146,6 +148,7 @@ export default function WorkspacesListPage() {
                 <Button
                   type="submit"
                   size="sm"
+                  className="w-full sm:w-auto min-h-[44px]"
                   disabled={!name || !slug || createMutation.isPending}
                 >
                   {createMutation.isPending
@@ -159,24 +162,24 @@ export default function WorkspacesListPage() {
       )}
 
       {isLoading ? (
-        <div className="flex items-center justify-center p-16 gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
+        <div className="flex items-center justify-center p-12 sm:p-16 gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
           Loading workspaces...
         </div>
       ) : workspaces.length === 0 ? (
-        <div className="p-16 text-center border border-dashed border-border rounded-lg">
+        <div className="p-8 sm:p-16 text-center border border-dashed border-border rounded-lg">
           <Database className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-40" />
           <h3 className="text-base font-semibold">No workspaces found</h3>
           <p className="text-xs text-muted-foreground mt-1 mb-4">
             Create your first workspace to start uploading documents and asking
             questions.
           </p>
-          <Button onClick={() => setIsCreating(true)} size="sm">
+          <Button onClick={() => setIsCreating(true)} size="sm" className="min-h-[44px]">
             Create Workspace
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {workspaces.map((ws: Workspace) => {
             const isOwner = ws.role === "OWNER";
 
@@ -185,29 +188,29 @@ export default function WorkspacesListPage() {
                 key={ws.id}
                 className="hover:border-primary/50 transition-colors flex flex-col justify-between"
               >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <Database className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-[11px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                <CardHeader className="p-4 sm:p-5 pb-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <Database className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-[11px] font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground truncate max-w-[150px]">
                       {ws.slug}
                     </span>
                   </div>
-                  <CardTitle className="text-base mt-2">{ws.name}</CardTitle>
+                  <CardTitle className="text-base mt-2 truncate">{ws.name}</CardTitle>
                   <CardDescription className="text-xs">
                     Created {new Date(ws.createdAt).toLocaleDateString()}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-0 flex items-center gap-2">
+                <CardContent className="p-4 sm:p-5 pt-0 flex items-center gap-2">
                   <Button
                     asChild
                     variant="outline"
                     size="sm"
-                    className="flex-1 justify-between"
+                    className="flex-1 justify-between min-h-[44px]"
                     onClick={() => setCurrentWorkspace(ws)}
                   >
                     <Link href={`/workspaces/${ws.slug || ws.id}`}>
                       <span>Enter Workspace</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
 
@@ -215,7 +218,7 @@ export default function WorkspacesListPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      className="h-11 w-11 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
                       title="Delete Workspace"
                       onClick={() => {
                         if (
