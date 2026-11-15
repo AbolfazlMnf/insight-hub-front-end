@@ -16,6 +16,7 @@ import {
   CardContent,
 } from "@/shared/components/ui/card";
 import Link from "next/link";
+import Image from "next/image";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { ThemeToggle } from "@/shared/components/ui/theme-toggle";
 import { toast } from "sonner";
@@ -70,8 +71,15 @@ export default function LoginPage() {
       </div>
       <Card className="w-full max-w-sm border-border bg-card shadow-sm">
         <CardHeader className="text-center pb-4">
-          <div className="h-9 w-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm tracking-wide mx-auto mb-2">
-            IH
+          <div className="h-12 w-12 rounded-xl overflow-hidden relative shrink-0 mx-auto mb-2">
+            <Image
+              src="/insightHub-optimized.png"
+              alt="Insight Hub Logo"
+              width={48}
+              height={48}
+              className="h-full w-full object-contain"
+              priority
+            />
           </div>
           <CardTitle className="text-lg sm:text-xl">Sign in to Insight Hub</CardTitle>
           <CardDescription className="text-xs">

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -129,17 +130,24 @@ export function Sidebar() {
     <div className="flex flex-col h-full w-full">
       {/* Brand Header */}
       <div className="h-14 border-b border-border flex items-center justify-between px-4">
-        <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm tracking-wide shrink-0">
-            IH
+        <Link href="/" className="flex items-center gap-2.5 min-w-0 group">
+          <div className="h-8 w-8 rounded-lg overflow-hidden relative shrink-0">
+            <Image
+              src="/insightHub-optimized.png"
+              alt="Insight Hub Logo"
+              width={32}
+              height={32}
+              className="h-full w-full object-contain"
+              priority
+            />
           </div>
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm leading-tight">Insight Hub</span>
-            <span className="text-[11px] text-muted-foreground leading-none">
+          <div className="flex flex-col min-w-0">
+            <span className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">Insight Hub</span>
+            <span className="text-[11px] text-muted-foreground leading-none truncate">
               Workspace Intelligence
             </span>
           </div>
-        </div>
+        </Link>
 
         {/* Explicit Close Button on Mobile Drawer */}
         {isMobile && (

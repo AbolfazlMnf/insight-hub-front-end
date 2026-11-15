@@ -7,6 +7,16 @@ import { Toaster } from '@/shared/components/ui/sonner';
 export const metadata: Metadata = {
   title: 'Insight Hub — Workspace Knowledge Assistant',
   description: 'Enterprise Agentic RAG and Knowledge Workspace Platform',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '32x32' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({

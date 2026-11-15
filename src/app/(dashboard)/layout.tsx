@@ -2,6 +2,8 @@
 
 import React, { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 import { Menu } from 'lucide-react';
 import { Sidebar } from '@/shared/components/layout/sidebar';
 import { useAuthStore } from '@/modules/auth/store';
@@ -41,14 +43,21 @@ export default function DashboardLayout({
             <Menu className="h-5 w-5" />
           </button>
 
-          <div className="flex items-center gap-2 truncate">
-            <div className="h-6 w-6 rounded bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs tracking-wide shrink-0">
-              IH
+          <Link href="/" className="flex items-center gap-2 truncate">
+            <div className="h-7 w-7 rounded-md overflow-hidden relative shrink-0">
+              <Image
+                src="/insightHub-optimized.png"
+                alt="Insight Hub Logo"
+                width={28}
+                height={28}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
             <span className="font-semibold text-xs sm:text-sm truncate">
               {currentWorkspace?.name || 'Insight Hub'}
             </span>
-          </div>
+          </Link>
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
